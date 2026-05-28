@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('driver_id')->constrained()->onDelete('cascade');
+            $table->string('brand');
+            $table->string('model');
+            $table->string('color');
+            $table->string('plate_number')->unique();
+            $table->year('year');
+            $table->enum('type', ['motorcycle', 'car'])->default('motorcycle');
+            $table->enum('verification_status', ['pending', 'verified', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

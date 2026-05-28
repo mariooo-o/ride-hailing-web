@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('drivers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId(users_id)->contrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('license_number')->unique();
-            $table->enum('Status', [
-                'active', 'inactive' 
+            $table->string('phone_number');
+            $table->string('profile_photo')->nullable();
+            $table->decimal('average_rating', 3, 2)->default(0.00);
+            $table->boolean('available')->default(false);
+            $table->enum('status', [
+                'active', 
+                'inactive' 
             ])->default('active');
             $table->timestamps();
         });
