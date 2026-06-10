@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller
@@ -12,7 +13,8 @@ class DriverController extends Controller
      */
     public function index()
     {
-        //
+        $drivers = Driver::with('user')->get();
+        return view('drivers.index', compact('drivers'));
     }
 
     /**
@@ -20,7 +22,7 @@ class DriverController extends Controller
      */
     public function create()
     {
-        //
+        return view('drivers.create');
     }
 
     /**
@@ -28,7 +30,30 @@ class DriverController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|email|unique:users',
+            'phone_number'   => 'required|string|max:15',
+            'password'       => 'required|min:8',
+            'license_number' => 'required|string|unique:drivers',
+        ]);
+
+        $user = User::create([
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'phone_number' => $request->phone_number,
+            'password'     => $request->password,
+            'role'         => 'driver',
+        ]);
+
+        Driver::create([
+            'user_id'        => $user->id,
+            'license_number' => $request->license_number,
+            'phone_number'   => $request->phone_number,
+            'status'         => 'active',
+        ]);
+
+        return redirect('/drivers')->with('success', 'Driver berhasil ditambahkan.');
     }
 
     /**
@@ -36,7 +61,8 @@ class DriverController extends Controller
      */
     public function show(Driver $driver)
     {
-        //
+        $driver->load('user', 'vehicle');
+        return view('drivers.show', compact('driver'));
     }
 
     /**
@@ -44,7 +70,8 @@ class DriverController extends Controller
      */
     public function edit(Driver $driver)
     {
-        //
+        $driver->load('user');
+        return view('drivers.edit', compact('driver'));
     }
 
     /**
@@ -52,7 +79,25 @@ class DriverController extends Controller
      */
     public function update(Request $request, Driver $driver)
     {
-        //
+         $request->validate([
+            'name'           => 'required|string|max:255',
+            'phone_number'   => 'required|string|max:15',
+            'license_number' => 'required|string|unique:drivers,license_number,' . $driver->id,
+            'status'         => 'required|in:active,inactive',
+        ]);
+
+        $driver->user->update([
+            'name'         => $request->name,
+            'phone_number' => $request->phone_number,
+        ]);
+
+        $driver->update([
+            'license_number' => $request->license_number,
+            'phone_number'   => $request->phone_number,
+            'status'         => $request->status,
+        ]);
+
+        return redirect('/drivers')->with('success', 'Driver berhasil diupdate.');
     }
 
     /**
@@ -60,6 +105,7 @@ class DriverController extends Controller
      */
     public function destroy(Driver $driver)
     {
-        //
+        $driver->user->delete(); 
+        return redirect('/drivers')->with('success', 'Driver berhasil dihapus.');
     }
 }

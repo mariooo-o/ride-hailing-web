@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DriverController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -12,3 +13,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/admin/dashboard', function(){ return 'Admin Dashboard'; });
 Route::get('/driver/dashboard', function(){ return 'Driver Dashboard'; });
 Route::get('/customer/dashboard', function(){ return 'Customer Dashboard'; });
+
+//Driver route
+Route::resource('drivers', DriverController::class);
