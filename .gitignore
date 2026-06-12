@@ -22,3 +22,13 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+# buka .gitignore lalu tambahkan:
+/resources/views/components
+/resources/views/layouts
+/resources/views/profile
+/routes/auth.php
+/tailwind.config.js
+/postcss.config.js
+/app/Http/Controllers/Auth
+/app/Http/Requests
+/app/View

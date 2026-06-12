@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('status', [
                 'active', 
                 'inactive' 
-            ])->default('active');
+            ])->default('inactive');
             $table->timestamps();
         });
     }
