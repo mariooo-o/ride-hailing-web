@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\VehicleController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -18,7 +19,13 @@ Route::get('/customer/dashboard', function(){ return 'Customer Dashboard'; });
 
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->group(function(){
+    // Driver Route
     Route::resource('drivers', DriverController::class);
     Route::patch('/drivers/{driver}/approve', [DriverController::class, 'approve'])->name('drivers.approve');
     Route::patch('/drivers/{driver}/suspend', [DriverController::class, 'suspend'])->name('drivers.suspend');
+
+    // Vehicle Routes
+    Route::resource('vehicles', VehicleController::class);
+    Route::patch('/vehicles/{vehicle}/verify', [VehicleController::class, 'verify'])->name('vehicles.verify');
+    Route::patch('/vehicles/{vehicle}/reject', [VehicleController::class, 'reject'])->name('vehicles.reject');
 });
