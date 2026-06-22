@@ -50,7 +50,7 @@ class DriverController extends Controller
             'user_id'        => $user->id,
             'license_number' => $request->license_number,
             'phone_number'   => $request->phone_number,
-            'status'         => 'active',
+            'status'         => 'inactive',
         ]);
 
         return redirect('/drivers')->with('success', 'Driver berhasil ditambahkan.');
@@ -107,5 +107,25 @@ class DriverController extends Controller
     {
         $driver->user->delete(); 
         return redirect('/drivers')->with('success', 'Driver berhasil dihapus.');
+    }
+
+    // Approve driver
+    public function approve(Driver $driver)
+    {
+        $driver->update(['status' => 'active']);
+    
+        // Sekalian verify kendaraannya
+        if($driver->vehicle){
+            $driver->vehicle->update(['verification_status' => 'verified']);
+        }
+    
+    return redirect('/drivers')->with('success', 'Driver dan kendaraan berhasil diaktifkan.');
+}
+
+    // Suspend driver
+    public function suspend(Driver $driver)
+    {
+        $driver->update(['status' => 'inactive']);
+        return redirect('/drivers')->with('success', 'Driver berhasil disuspend.');
     }
 }
