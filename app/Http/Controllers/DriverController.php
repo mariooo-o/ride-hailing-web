@@ -113,8 +113,14 @@ class DriverController extends Controller
     public function approve(Driver $driver)
     {
         $driver->update(['status' => 'active']);
-        return redirect('/drivers')->with('success', 'Driver berhasil diaktifkan.');
-    }
+    
+        // Sekalian verify kendaraannya
+        if($driver->vehicle){
+            $driver->vehicle->update(['verification_status' => 'verified']);
+        }
+    
+    return redirect('/drivers')->with('success', 'Driver dan kendaraan berhasil diaktifkan.');
+}
 
     // Suspend driver
     public function suspend(Driver $driver)
