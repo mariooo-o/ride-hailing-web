@@ -6,6 +6,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DriverDashboardController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -14,8 +15,11 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Dashboard sementara
-Route::get('/driver/dashboard', function(){ return 'Driver Dashboard'; });
+// Driver Routes
+Route::middleware(['auth', 'role:driver'])->group(function(){
+    Route::get('/driver/dashboard', [DriverDashboardController::class, 'index'])->name('driver.dashboard');
+    Route::patch('/driver/toggle-available', [DriverDashboardController::class, 'toggleAvailable'])->name('driver.toggle-available');
+});
 
 // Customer Routes
 Route::middleware(['auth', 'role:customer'])->group(function(){
@@ -28,7 +32,7 @@ Route::middleware(['auth', 'role:customer'])->group(function(){
 Route::middleware(['auth', 'role:admin'])->group(function(){
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     
-    // Driver Route
+    // Drivers Route
     Route::resource('drivers', DriverController::class);
     Route::patch('/drivers/{driver}/approve', [DriverController::class, 'approve'])->name('drivers.approve');
     Route::patch('/drivers/{driver}/suspend', [DriverController::class, 'suspend'])->name('drivers.suspend');
