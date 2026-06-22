@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\OrderController;
+
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -22,3 +24,11 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
     Route::patch('/drivers/{driver}/approve', [DriverController::class, 'approve'])->name('drivers.approve');
     Route::patch('/drivers/{driver}/suspend', [DriverController::class, 'suspend'])->name('drivers.suspend');
 });
+
+//Order Routes
+Route::resource('orders', OrderController::class)
+    ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+ 
+// Complete order — pakai POST supaya tidak bisa di-trigger dari URL langsung
+Route::post('/orders/{id}/complete', [OrderController::class, 'complete'])
+    ->name('orders.complete');
