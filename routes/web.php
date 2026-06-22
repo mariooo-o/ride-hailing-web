@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\AdminController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -13,12 +14,13 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Dashboard sementara
-Route::get('/admin/dashboard', function(){ return 'Admin Dashboard'; });
 Route::get('/driver/dashboard', function(){ return 'Driver Dashboard'; });
 Route::get('/customer/dashboard', function(){ return 'Customer Dashboard'; });
 
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->group(function(){
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    
     // Driver Route
     Route::resource('drivers', DriverController::class);
     Route::patch('/drivers/{driver}/approve', [DriverController::class, 'approve'])->name('drivers.approve');
