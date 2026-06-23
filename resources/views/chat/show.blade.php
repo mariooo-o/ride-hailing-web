@@ -17,7 +17,6 @@
             flex-direction: column;
         }
 
-        /* ── Header ── */
         .chat-header {
             background: #075E54;
             color: #fff;
@@ -67,7 +66,6 @@
             border-radius: 20px;
         }
 
-        /* ── Info Bar ── */
         .info-bar {
             background: #FFF8E1;
             padding: 8px 16px;
@@ -80,7 +78,6 @@
             gap: 6px;
         }
 
-        /* ── Messages ── */
         .messages-wrap {
             flex: 1;
             overflow-y: auto;
@@ -153,7 +150,6 @@
             border-radius: 10px;
         }
 
-        /* ── Input Area ── */
         .input-area {
             background: #F0F0F0;
             padding: 10px 12px;
@@ -195,15 +191,6 @@
 
         .send-btn:hover { background: #128C7E; }
         .send-btn:disabled { background: #adb5bd; cursor: not-allowed; }
-
-        /* ── Typing indicator ── */
-        .typing-indicator {
-            display: none;
-            padding: 0 12px 4px;
-            font-size: 0.75rem;
-            color: #6c757d;
-            font-style: italic;
-        }
     </style>
 </head>
 <body>
@@ -214,25 +201,38 @@
         <i class="bi bi-arrow-left"></i>
     </a>
     <div class="header-avatar">
-        @if($as === 'admin') <i class="bi bi-headset"></i>
-        @else <i class="bi bi-person"></i> @endif
+        @if($as === 'customer')
+            <i class="bi bi-car-front-fill"></i>
+        @else
+            <i class="bi bi-person-fill"></i>
+        @endif
     </div>
     <div class="header-info">
-        <div class="header-name">Order #{{ $order->id }}</div>
+        <div class="header-name">
+            @if($as === 'customer')
+                {{ $order->driver->user->name ?? 'Driver' }}
+            @else
+                {{ $order->user->name ?? 'Customer' }}
+            @endif
+        </div>
         <div class="header-sub">
-            {{ Str::limit($order->pickup, 20) }} → {{ Str::limit($order->destination, 20) }}
+            {{ Str::limit($order->pickup, 20) }} &rarr; {{ Str::limit($order->destination, 20) }}
         </div>
     </div>
     <div class="header-role">
-        {{ $as === 'admin' ? '👨‍💼 Admin' : '🧑 Customer' }}
+        @if($as === 'customer')
+            Kamu: Customer
+        @else
+            Kamu: Driver
+        @endif
     </div>
 </div>
 
 {{-- Info bar --}}
 <div class="info-bar">
     <i class="bi bi-info-circle"></i>
-    Kendaraan: <strong>{{ $order->vehicle_type }}</strong> &nbsp;·&nbsp;
-    Jarak: <strong>{{ number_format($order->distance, 2) }} km</strong> &nbsp;·&nbsp;
+    Kendaraan: <strong>{{ $order->vehicle_type }}</strong> &nbsp;&middot;&nbsp;
+    Jarak: <strong>{{ number_format($order->distance, 2) }} km</strong> &nbsp;&middot;&nbsp;
     Harga: <strong>Rp {{ number_format($order->price, 0, ',', '.') }}</strong>
 </div>
 
@@ -260,8 +260,6 @@
 
 </div>
 
-<div class="typing-indicator" id="typingIndicator">mengetik...</div>
-
 {{-- Input --}}
 <div class="input-area">
     <textarea
@@ -276,27 +274,23 @@
 </div>
 
 <script>
-    const ORDER_ID   = {{ $order->id }};
-    const AS         = '{{ $as }}';
-    const SENDER_NAME = AS === 'admin' ? 'Admin' : 'Customer';
-    const CSRF       = document.querySelector('meta[name="csrf-token"]').content;
-    const POLL_URL   = `/chat/${ORDER_ID}/poll?as=${AS}`;
-    const SEND_URL   = `/chat/${ORDER_ID}/send`;
+    const ORDER_ID = {{ $order->id }};
+    const AS       = '{{ $as }}';
+    const CSRF     = document.querySelector('meta[name="csrf-token"]').content;
+    const POLL_URL = `/chat/${ORDER_ID}/poll`;
+    const SEND_URL = `/chat/${ORDER_ID}/send`;
 
     const wrap    = document.getElementById('messagesWrap');
     const input   = document.getElementById('msgInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    // ID pesan terakhir untuk polling
     let lastId = {{ $messages->last()?->id ?? 0 }};
 
-    // ── Scroll ke bawah ──────────────────────────────────────────────────
     function scrollBottom() {
         wrap.scrollTop = wrap.scrollHeight;
     }
     scrollBottom();
 
-    // ── Render bubble pesan ───────────────────────────────────────────────
     function renderMessage(msg) {
         const isMe = msg.sender === AS;
         const row  = document.createElement('div');
@@ -322,13 +316,12 @@
             .replace(/"/g, '&quot;');
     }
 
-    // ── Kirim pesan ───────────────────────────────────────────────────────
     async function sendMessage() {
         const text = input.value.trim();
         if (!text) return;
 
         sendBtn.disabled = true;
-        input.value      = '';
+        input.value = '';
         input.style.height = 'auto';
 
         try {
@@ -339,11 +332,7 @@
                     'X-CSRF-TOKEN': CSRF,
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({
-                    message:     text,
-                    sender:      AS,
-                    sender_name: SENDER_NAME,
-                }),
+                body: JSON.stringify({ message: text }),
             });
 
             const msg = await res.json();
@@ -352,48 +341,42 @@
 
         } catch (err) {
             console.error('Gagal kirim:', err);
-            input.value = text; // kembalikan teks jika gagal
+            input.value = text;
         } finally {
             sendBtn.disabled = false;
             input.focus();
         }
     }
 
-    // ── Polling pesan baru ────────────────────────────────────────────────
     async function pollMessages() {
         try {
-            const res  = await fetch(`${POLL_URL}&last_id=${lastId}`, {
+            const res  = await fetch(`${POLL_URL}?last_id=${lastId}`, {
                 headers: { 'Accept': 'application/json' }
             });
             const msgs = await res.json();
 
             msgs.forEach(msg => {
-                // Jangan render pesan yang dikirim sendiri (sudah ada)
                 if (msg.sender !== AS) {
                     renderMessage(msg);
                 }
                 if (msg.id > lastId) lastId = msg.id;
             });
         } catch (err) {
-            // Silent fail — polling coba lagi nanti
+            // silent fail — coba lagi di polling berikutnya
         }
     }
 
-    // Polling setiap 3 detik
     setInterval(pollMessages, 3000);
 
-    // ── Event listeners ───────────────────────────────────────────────────
     sendBtn.addEventListener('click', sendMessage);
 
     input.addEventListener('keydown', function (e) {
-        // Enter kirim, Shift+Enter baris baru
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
     });
 
-    // Auto-resize textarea
     input.addEventListener('input', function () {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 120) + 'px';

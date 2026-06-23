@@ -96,6 +96,13 @@
                                 <span class="badge bg-secondary">Sudah Dirating</span>
                             @endif
                         @endif
+
+                        {{-- Chat --}}
+                        @if($order->driver)
+                            <a href="{{ route('chat.show', $order->id) }}" class="btn btn-info btn-sm">
+                                <i class="bi bi-chat-dots"></i> Chat
+                            </a>
+                        @endif
                     </td>
                 </tr>
             @empty

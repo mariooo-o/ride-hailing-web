@@ -87,6 +87,7 @@
                     <td>Rp {{ number_format($order->price, 0, ',', '.') }}</td>
                     <td>{{ $order->status }}</td>
                     <td>
+                        <a href="{{ route('chat.show', $order->id) }}">Chat</a>
                         @if($order->status == 'ongoing')
                             <form method="POST" action="/orders/{{ $order->id }}/complete">
                                 @csrf
