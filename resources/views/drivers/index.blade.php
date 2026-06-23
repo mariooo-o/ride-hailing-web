@@ -44,6 +44,20 @@
                         @method('DELETE')
                         <button type="submit" onclick="return confirm('Hapus driver ini?')">Hapus</button>
                     </form>
+                    |
+                    @if($driver->status == 'inactive')
+                        <form method="POST" action="/drivers/{{ $driver->id }}/approve" style="display:inline">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit">Approve</button>
+                        </form>
+                    @else
+                        <form method="POST" action="/drivers/{{ $driver->id }}/suspend" style="display:inline">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit">Suspend</button>
+                        </form>
+                    @endif
                 </td>
             </tr>
             @endforeach
