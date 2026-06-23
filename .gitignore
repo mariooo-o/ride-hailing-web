@@ -24,7 +24,6 @@ Homestead.yaml
 Thumbs.db
 # buka .gitignore lalu tambahkan:
 /resources/views/components
-/resources/views/layouts
 /resources/views/profile
 /routes/auth.php
 /tailwind.config.js
