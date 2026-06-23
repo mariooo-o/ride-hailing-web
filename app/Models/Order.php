@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Driver;
+use App\Models\Rating;
 
 class Order extends Model
 {
@@ -29,5 +30,13 @@ class Order extends Model
 
     public function driver(){
         return $this->belongsTo(Driver::class);
+    }
+
+    public function payment(){
+    return $this->hasOne(Payment::class);
+    }
+
+    public function ratings(){
+        return $this->hasMany(Rating::class);
     }
 }

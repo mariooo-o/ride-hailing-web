@@ -8,6 +8,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverDashboardController;
+use App\Http\Controllers\RatingController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -33,6 +34,10 @@ Route::middleware(['auth', 'role:customer'])->group(function(){
     Route::get('/customer/daftar-driver', [CustomerController::class, 'daftarDriver'])->name('customer.daftar-driver');
     Route::post('/customer/daftar-driver', [CustomerController::class, 'submitDaftarDriver'])->name('customer.submit-daftar-driver');
     Route::resource('orders', OrderController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    // Rating
+    Route::get('/ratings/{orderId}/create', [RatingController::class, 'create'])->name('ratings.create');
+    Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
 });
 
 // Admin Routes

@@ -13,7 +13,10 @@ class OrderController extends Controller
     // ─── INDEX ───────────────────────────────────────────────────────────────
     public function index()
     {
-        $orders = Order::with('user', 'driver.user')->latest()->get();
+        $orders = Order::with('user', 'driver.user', 'ratings')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
         return view('orders.index', compact('orders'));
     }
 
@@ -27,9 +30,10 @@ class OrderController extends Controller
     public function store(Request $request, OpenStreetMapService $map)
     {
         $request->validate([
-            'pickup'       => 'required|string|min:3|max:255',
-            'destination'  => 'required|string|min:3|max:255',
-            'vehicle_type' => 'required|in:Motor,Mobil',
+            'pickup'         => 'required|string|min:3|max:255',
+            'destination'    => 'required|string|min:3|max:255',
+            'vehicle_type'   => 'required|in:Motor,Mobil',
+            'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,qris',
         ]);
 
         if (strtolower(trim($request->pickup)) === strtolower(trim($request->destination))) {
@@ -66,8 +70,9 @@ class OrderController extends Controller
         $price = (int) round($basePrice + ($distance * $pricePerKm));
         $price = max($price, $minPrice);
 
-        Order::create([
-            'user_id'         => Auth::id(), // otomatis dari user yang login
+        // Simpan order
+        $order = Order::create([
+            'user_id'         => Auth::id(),
             'pickup'          => $request->pickup,
             'destination'     => $request->destination,
             'pickup_lat'      => $pickupLat,
@@ -78,6 +83,15 @@ class OrderController extends Controller
             'vehicle_type'    => $request->vehicle_type,
             'price'           => $price,
             'status'          => 'pending',
+        ]);
+
+        // Sekalian buat record payment
+        \App\Models\Payment::create([
+            'order_id'       => $order->id,
+            'user_id'        => Auth::id(),
+            'amount'         => $price,
+            'payment_method' => $request->payment_method,
+            'status'         => 'pending',
         ]);
 
         return redirect()->route('orders.index')->with('success', 'Order berhasil dibuat!');
@@ -136,9 +150,13 @@ class OrderController extends Controller
     public function complete($id)
     {
         $order = Order::findOrFail($id);
-        $order->update(['status' => 'completed']);
+        $order->update(['status' => 'paid']);
 
-        // Cek yang complete driver atau customer
+        // Update payment jadi success
+        if($order->payment){
+            $order->payment->update(['status' => 'success']);
+        }
+
         if(Auth::user()->role == 'driver'){
             return redirect()->route('driver.orders')->with('success', 'Order ditandai selesai.');
         }
