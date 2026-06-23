@@ -10,6 +10,20 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverDashboardController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ChatController;
+use Illuminate\Support\Facades\Auth;
+
+Route::get('/', function () {
+    if (Auth::check()) {
+        $role = Auth::user()->role;
+        return match($role) {
+            'customer' => redirect()->route('customer.dashboard'),
+            'driver'   => redirect()->route('driver.dashboard'),
+            'admin'    => redirect()->route('admin.dashboard'),
+            default    => redirect()->route('login'),
+        };
+    }
+    return redirect()->route('login');
+});
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
