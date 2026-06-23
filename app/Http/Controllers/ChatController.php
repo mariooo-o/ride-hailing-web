@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
-    // ── Tentukan role user login terhadap order ini ──────────────────────
+    //Tentukan role user login terhadap order ini
     private function resolveRole(Order $order)
     {
         $userId = Auth::id();
@@ -25,7 +25,7 @@ class ChatController extends Controller
         return null; // user ini bukan customer/driver di order ini
     }
 
-    // ── Daftar chat milik user yang login ─────────────────────────────────
+    //Daftar chat milik user yang login
     public function index()
     {
         $user = Auth::user();
@@ -57,7 +57,7 @@ class ChatController extends Controller
 
         return view('chat.index', compact('orders', 'role'));
     }
-    // ── Halaman chat untuk 1 order ─────────────────────────────────────────
+    //Halaman chat untuk 1 order
     public function show($orderId)
     {
         $order = Order::with('user', 'driver.user')->findOrFail($orderId);
@@ -79,7 +79,7 @@ class ChatController extends Controller
         return view('chat.show', compact('order', 'messages', 'as'));
     }
 
-    // ── Kirim pesan (AJAX) ───────────────────────────────────────────────
+    // Kirim pesan (AJAX)
     public function send(Request $request, $orderId)
     {
         $request->validate([
@@ -109,7 +109,7 @@ class ChatController extends Controller
         ]);
     }
 
-    // ── Polling: ambil pesan baru (AJAX) ─────────────────────────────────
+    // Polling: ambil pesan baru (AJAX)
     public function poll(Request $request, $orderId)
     {
         $order = Order::findOrFail($orderId);
