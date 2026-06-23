@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Driver;
 
 class Order extends Model
 {
     protected $fillable = [
+        'user_id',
+        'driver_id',
         'pickup',
         'destination',
         'pickup_lat',
@@ -19,12 +23,11 @@ class Order extends Model
         'status',
     ];
 
-    protected $casts = [
-        'pickup_lat'      => 'float',
-        'pickup_lng'      => 'float',
-        'destination_lat' => 'float',
-        'destination_lng' => 'float',
-        'distance'        => 'float',
-        'price'           => 'integer',
-    ];
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function driver(){
+        return $this->belongsTo(Driver::class);
+    }
 }
