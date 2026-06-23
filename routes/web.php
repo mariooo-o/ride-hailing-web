@@ -20,6 +20,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'role:driver'])->group(function(){
     Route::get('/driver/dashboard', [DriverDashboardController::class, 'index'])->name('driver.dashboard');
     Route::patch('/driver/toggle-available', [DriverDashboardController::class, 'toggleAvailable'])->name('driver.toggle-available');
+
+    // Order Untuk Driver
+    Route::get('/driver/orders', [OrderController::class, 'driverOrders'])->name('driver.orders');
+    Route::post('/driver/orders/{id}/take', [OrderController::class, 'takeOrder'])->name('driver.take-order');
+    Route::post('/orders/{id}/complete', [OrderController::class, 'complete'])->name('orders.complete');
 });
 
 // Customer Routes
@@ -28,7 +33,6 @@ Route::middleware(['auth', 'role:customer'])->group(function(){
     Route::get('/customer/daftar-driver', [CustomerController::class, 'daftarDriver'])->name('customer.daftar-driver');
     Route::post('/customer/daftar-driver', [CustomerController::class, 'submitDaftarDriver'])->name('customer.submit-daftar-driver');
     Route::resource('orders', OrderController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-    Route::post('/orders/{id}/complete', [OrderController::class, 'complete'])->name('orders.complete');
 });
 
 // Admin Routes
