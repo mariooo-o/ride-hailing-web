@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ChatController;
 
 
 // Auth Routes
@@ -32,3 +33,9 @@ Route::resource('orders', OrderController::class)
 // Complete order — pakai POST supaya tidak bisa di-trigger dari URL langsung
 Route::post('/orders/{id}/complete', [OrderController::class, 'complete'])
     ->name('orders.complete');
+
+//Message Routes
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::get('/chat/{orderId}', [ChatController::class, 'show'])->name('chat.show');
+Route::post('/chat/{orderId}/send', [ChatController::class, 'send'])->name('chat.send');
+Route::get('/chat/{orderId}/poll', [ChatController::class, 'poll'])->name('chat.poll');

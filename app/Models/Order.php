@@ -27,4 +27,19 @@ class Order extends Model
         'distance'        => 'float',
         'price'           => 'integer',
     ];
+
+        // Relasi ke Message
+    public function messages()
+    {
+        return $this->hasMany(Message::class)->orderBy('created_at');
+    }
+ 
+    // Hitung pesan belum dibaca oleh admin
+    public function unreadByAdmin()
+    {
+        return $this->messages()
+            ->where('sender', 'customer')
+            ->where('is_read', false)
+            ->count();
+    }
 }
