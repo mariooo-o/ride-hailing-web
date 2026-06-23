@@ -95,5 +95,7 @@
     @else
         <p>Belum ada kendaraan terdaftar.</p>
     @endif
+    <h3>Menu</h3>
+    <a href="/driver/orders">Lihat Order Tersedia</a>
 </body>
 </html>

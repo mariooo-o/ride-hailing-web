@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Driver;
+use App\Models\Rating;
 
 class Order extends Model
 {
     protected $fillable = [
+        'user_id',
+        'driver_id',
         'pickup',
         'destination',
         'pickup_lat',
@@ -19,27 +24,19 @@ class Order extends Model
         'status',
     ];
 
-    protected $casts = [
-        'pickup_lat'      => 'float',
-        'pickup_lng'      => 'float',
-        'destination_lat' => 'float',
-        'destination_lng' => 'float',
-        'distance'        => 'float',
-        'price'           => 'integer',
-    ];
-
-        // Relasi ke Message
-    public function messages()
-    {
-        return $this->hasMany(Message::class)->orderBy('created_at');
+    public function user(){
+        return $this->belongsTo(User::class);
     }
- 
-    // Hitung pesan belum dibaca oleh admin
-    public function unreadByAdmin()
-    {
-        return $this->messages()
-            ->where('sender', 'customer')
-            ->where('is_read', false)
-            ->count();
+
+    public function driver(){
+        return $this->belongsTo(Driver::class);
+    }
+
+    public function payment(){
+    return $this->hasOne(Payment::class);
+    }
+
+    public function ratings(){
+        return $this->hasMany(Rating::class);
     }
 }
