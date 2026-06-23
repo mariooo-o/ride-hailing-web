@@ -53,7 +53,7 @@ class ChatController extends Controller
     {
         $request->validate([
             'message'     => 'required|string|max:1000',
-            'sender'      => 'required|in:customer,admin',
+            'sender'      => 'required|in:customer,admin,driver',
             'sender_name' => 'required|string|max:100',
         ]);
 
