@@ -9,9 +9,8 @@
 
 <div class="container mt-5">
 
-    <h1 class="mb-4">Daftar Order Ride Hailing</h1>
+    <h1 class="mb-4">Daftar Order</h1>
 
-    {{-- Flash messages --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show">
             {{ session('success') }}
@@ -47,48 +46,56 @@
             @forelse($orders as $order)
                 <tr>
                     <td>{{ $order->id }}</td>
-                    <td>{{ $order->pickup }}</td>
-                    <td>{{ $order->destination }}</td>
+                    <td>{{ Str::limit($order->pickup, 30) }}</td>
+                    <td>{{ Str::limit($order->destination, 30) }}</td>
                     <td>{{ $order->vehicle_type }}</td>
                     <td>{{ number_format($order->distance, 2) }} km</td>
                     <td>Rp {{ number_format($order->price, 0, ',', '.') }}</td>
                     <td>
                         @if($order->status === 'pending')
                             <span class="badge bg-warning text-dark">Pending</span>
+                        @elseif($order->status === 'ongoing')
+                            <span class="badge bg-info">Ongoing</span>
+                        @elseif($order->status === 'paid')
+                            <span class="badge bg-success">Paid</span>
                         @elseif($order->status === 'completed')
                             <span class="badge bg-success">Completed</span>
-                        @else
+                        @elseif($order->status === 'cancelled')
                             <span class="badge bg-danger">Cancelled</span>
+                        @else
+                            <span class="badge bg-secondary">{{ $order->status }}</span>
                         @endif
                     </td>
                     <td>
                         {{-- Edit --}}
-                        <a href="{{ route('orders.edit', $order->id) }}"
-                           class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
-
-                        {{-- Complete (hanya jika masih pending) --}}
                         @if($order->status === 'pending')
-                            <form action="{{ route('orders.complete', $order->id) }}"
-                                  method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    Complete
-                                </button>
-                            </form>
+                            <a href="{{ route('orders.edit', $order->id) }}"
+                               class="btn btn-warning btn-sm">Edit</a>
                         @endif
 
                         {{-- Delete --}}
-                        <form action="{{ route('orders.destroy', $order->id) }}"
-                              method="POST" class="d-inline"
-                              onsubmit="return confirm('Yakin hapus order ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                Hapus
-                            </button>
-                        </form>
+                        @if($order->status === 'pending')
+                            <form action="{{ route('orders.destroy', $order->id) }}"
+                                  method="POST" class="d-inline"
+                                  onsubmit="return confirm('Yakin hapus order ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                            </form>
+                        @endif
+
+                        {{-- Beri Rating --}}
+                        @if($order->status === 'paid' && $order->driver)
+                            @php
+                                $alreadyRated = $order->ratings->where('rater_id', Auth::id())->where('type', 'driver')->count();
+                            @endphp
+                            @if(!$alreadyRated)
+                                <a href="{{ route('ratings.create', $order->id) }}"
+                                   class="btn btn-primary btn-sm">Beri Rating</a>
+                            @else
+                                <span class="badge bg-secondary">Sudah Dirating</span>
+                            @endif
+                        @endif
                     </td>
                 </tr>
             @empty

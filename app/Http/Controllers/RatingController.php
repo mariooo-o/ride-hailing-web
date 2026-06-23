@@ -3,10 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rating;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RatingController extends Controller
 {
+    public function create($orderId)
+    {
+        $order = Order::with('driver.user')->findOrFail($orderId);
+
+        // Cek order sudah paid
+        if($order->status !== 'paid'){
+            return redirect()->back()->with('error', 'Order belum selesai.');
+        }
+
+        // Cek sudah pernah rating atau belum
+        $alreadyRated = Rating::where('order_id', $orderId)
+            ->where('rater_id', Auth::id())
+            ->where('type', 'driver')
+            ->exists();
+
+        if($alreadyRated){
+            return redirect()->back()->with('error', 'Kamu sudah memberi rating untuk order ini.');
+        }
+
+        return view('ratings.create', compact('order'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -18,24 +42,24 @@ class RatingController extends Controller
         ]);
 
         $existing = Rating::where('order_id', $request->order_id)
-            ->where('rater_id', auth()->id())
+            ->where('rater_id', Auth::id())
             ->where('type', $request->type)
             ->first();
 
-        if ($existing) {
-            return response()->json(['message' => 'Sudah pernah memberi rating'], 409);
+        if($existing){
+            return redirect()->back()->with('error', 'Kamu sudah memberi rating untuk order ini.');
         }
 
-        $rating = Rating::create([
+        Rating::create([
             'order_id' => $request->order_id,
-            'rater_id' => auth()->id(),
+            'rater_id' => Auth::id(),
             'rated_id' => $request->rated_id,
             'stars'    => $request->stars,
             'type'     => $request->type,
             'comment'  => $request->comment,
         ]);
 
-        return response()->json(['message' => 'Rating berhasil disimpan', 'data' => $rating], 201);
+        return redirect()->route('orders.index')->with('success', 'Rating berhasil diberikan!');
     }
 
     public function show($userId)

@@ -130,6 +130,29 @@
             @enderror
         </div>
 
+        {{-- Payment Method --}}
+        <div class="mb-4">
+            <label class="form-label fw-bold">Metode Pembayaran</label>
+            <select name="payment_method"
+                    class="form-select @error('payment_method') is-invalid @enderror">
+                <option value="qris" {{ old('payment_method') === 'qris' ? 'selected' : '' }}>
+                    QRIS
+                </option>
+                <option value="e_wallet" {{ old('payment_method') === 'e_wallet' ? 'selected' : '' }}>
+                    E-Wallet
+                </option>
+                <option value="bank_transfer" {{ old('payment_method') === 'bank_transfer' ? 'selected' : '' }}>
+                    Bank Transfer
+                </option>
+                <option value="credit_card" {{ old('payment_method') === 'credit_card' ? 'selected' : '' }}>
+                    Kartu Kredit
+                </option>
+            </select>
+            @error('payment_method')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+
         <button type="submit" class="btn btn-primary w-100 py-2">
             Pesan Sekarang
         </button>
