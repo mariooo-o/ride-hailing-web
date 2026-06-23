@@ -39,4 +39,8 @@ class Order extends Model
     public function ratings(){
         return $this->hasMany(Rating::class);
     }
+
+    public function messages(){
+    return $this->hasMany(Message::class);
+}
 }

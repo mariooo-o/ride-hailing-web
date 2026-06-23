@@ -1,57 +1,60 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-</head>
-<body>
-    <h2>Admin Dashboard</h2>
-    <p>Selamat datang, {{ Auth::user()->name }}!</p>
+@extends('layouts.main')
 
-    <form method="POST" action="/logout">
-        @csrf
-        <button type="submit">Logout</button>
-    </form>
+@section('title', 'Admin Dashboard')
 
-    <hr>
+@section('content')
 
-    <h3>Ringkasan</h3>
-    <table border="1" cellpadding="8">
-        <tr>
-            <td>Total Driver</td>
-            <td>{{ $totalDrivers }}</td>
-        </tr>
-        <tr>
-            <td>Driver Aktif</td>
-            <td>{{ $activeDrivers }}</td>
-        </tr>
-        <tr>
-            <td>Driver Pending (belum diapprove)</td>
-            <td>{{ $pendingDrivers }}</td>
-        </tr>
-        <tr>
-            <td>Total Kendaraan</td>
-            <td>{{ $totalVehicles }}</td>
-        </tr>
-        <tr>
-            <td>Kendaraan Terverifikasi</td>
-            <td>{{ $verifiedVehicles }}</td>
-        </tr>
-        <tr>
-            <td>Kendaraan Pending</td>
-            <td>{{ $pendingVehicles }}</td>
-        </tr>
-        <tr>
-            <td>Total Customer</td>
-            <td>{{ $totalCustomers }}</td>
-        </tr>
-    </table>
+    <h2 class="mb-4">Selamat datang, {{ Auth::user()->name }}!</h2>
 
-    <hr>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Total Driver</div>
+                <div class="fs-3 fw-bold">{{ $totalDrivers }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Driver Aktif</div>
+                <div class="fs-3 fw-bold text-success">{{ $activeDrivers }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Driver Pending</div>
+                <div class="fs-3 fw-bold text-warning">{{ $pendingDrivers }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Total Kendaraan</div>
+                <div class="fs-3 fw-bold">{{ $totalVehicles }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Kendaraan Terverifikasi</div>
+                <div class="fs-3 fw-bold text-success">{{ $verifiedVehicles }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Kendaraan Pending</div>
+                <div class="fs-3 fw-bold text-warning">{{ $pendingVehicles }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Total Customer</div>
+                <div class="fs-3 fw-bold">{{ $totalCustomers }}</div>
+            </div>
+        </div>
+    </div>
 
-    <h3>Menu</h3>
-    <a href="/drivers">Kelola Driver</a> |
-    <a href="/vehicles">Kelola Kendaraan</a>
-</body>
-</html>
+    <div class="card p-4">
+        <h5 class="mb-3">Menu</h5>
+        <a href="{{ route('drivers.index') }}" class="btn btn-primary me-2">Kelola Driver</a>
+        <a href="{{ route('vehicles.index') }}" class="btn btn-primary">Kelola Kendaraan</a>
+    </div>
+
+@endsection

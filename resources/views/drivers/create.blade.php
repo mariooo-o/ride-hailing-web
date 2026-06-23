@@ -1,46 +1,65 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Driver</title>
-</head>
-<body>
-    <h2>Tambah Driver</h2>
+@extends('layouts.main')
 
-    @if($errors->any())
-        <p>{{ $errors->first() }}</p>
-    @endif
+@section('title', 'Tambah Driver')
 
-    <form method="POST" action="/drivers">
-        @csrf
-        <div>
-            <label>Nama</label><br>
-            <input type="text" name="name" value="{{ old('name') }}">
+@section('content')
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <a href="{{ route('drivers.index') }}" class="btn btn-outline-secondary btn-sm">← Kembali</a>
+            <h4 class="fw-bold mb-0">Tambah Driver</h4>
         </div>
-        <br>
-        <div>
-            <label>Email</label><br>
-            <input type="email" name="email" value="{{ old('email') }}">
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST" action="{{ route('drivers.store') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Nama</label>
+                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                            value="{{ old('name') }}">
+                        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                            value="{{ old('email') }}">
+                        @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">No. HP</label>
+                        <input type="text" name="phone_number" class="form-control @error('phone_number') is-invalid @enderror"
+                            value="{{ old('phone_number') }}">
+                        @error('phone_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">No. SIM</label>
+                        <input type="text" name="license_number" class="form-control @error('license_number') is-invalid @enderror"
+                            value="{{ old('license_number') }}">
+                        @error('license_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror">
+                        @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">Simpan</button>
+                        <a href="{{ route('drivers.index') }}" class="btn btn-outline-secondary px-4">Batal</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        <br>
-        <div>
-            <label>No. HP</label><br>
-            <input type="text" name="phone_number" value="{{ old('phone_number') }}">
-        </div>
-        <br>
-        <div>
-            <label>No. SIM</label><br>
-            <input type="text" name="license_number" value="{{ old('license_number') }}">
-        </div>
-        <br>
-        <div>
-            <label>Password</label><br>
-            <input type="password" name="password">
-        </div>
-        <br>
-        <button type="submit">Simpan</button>
-        <a href="/drivers">Batal</a>
-    </form>
-</body>
-</html>
+    </div>
+</div>
+@endsection

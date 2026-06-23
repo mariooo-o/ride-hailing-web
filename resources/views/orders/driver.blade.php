@@ -1,105 +1,108 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Driver</title>
-</head>
-<body>
-    <h2>Order Tersedia</h2>
+@extends('layouts.main')
 
-    <a href="/driver/dashboard">← Kembali ke Dashboard</a>
+@section('title', 'Order Driver')
 
-    @if(session('success'))
-        <p>{{ session('success') }}</p>
-    @endif
+@section('content')
+<h4 class="fw-bold mb-4">Order Tersedia</h4>
 
-    @if(session('error'))
-        <p>{{ session('error') }}</p>
-    @endif
-
-    <h3>Order Pending</h3>
-    @if($pendingOrders->isEmpty())
-        <p>Tidak ada order pending saat ini.</p>
-    @else
-        <table border="1" cellpadding="8">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Customer</th>
-                    <th>Pickup</th>
-                    <th>Tujuan</th>
-                    <th>Jarak</th>
-                    <th>Tipe</th>
-                    <th>Harga</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($pendingOrders as $index => $order)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $order->user->name ?? 'Unknown' }}</td>
-                    <td>{{ $order->pickup }}</td>
-                    <td>{{ $order->destination }}</td>
-                    <td>{{ number_format($order->distance, 2) }} km</td>
-                    <td>{{ $order->vehicle_type }}</td>
-                    <td>Rp {{ number_format($order->price, 0, ',', '.') }}</td>
-                    <td>
-                        <form method="POST" action="/driver/orders/{{ $order->id }}/take">
-                            @csrf
-                            <button type="submit">Ambil Order</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
-
-    <hr>
-
-    <h3>Order Saya</h3>
-    @if($myOrders->isEmpty())
-        <p>Belum ada order yang diambil.</p>
-    @else
-        <table border="1" cellpadding="8">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Customer</th>
-                    <th>Pickup</th>
-                    <th>Tujuan</th>
-                    <th>Jarak</th>
-                    <th>Harga</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($myOrders as $index => $order)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $order->user->name ?? 'Unknown' }}</td>
-                    <td>{{ $order->pickup }}</td>
-                    <td>{{ $order->destination }}</td>
-                    <td>{{ number_format($order->distance, 2) }} km</td>
-                    <td>Rp {{ number_format($order->price, 0, ',', '.') }}</td>
-                    <td>{{ $order->status }}</td>
-                    <td>
-                        @if($order->status == 'ongoing')
-                            <form method="POST" action="/orders/{{ $order->id }}/complete">
+{{-- Order Pending --}}
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="fw-bold mb-3">Order Pending</h6>
+        @if($pendingOrders->isEmpty())
+            <p class="text-muted mb-0">Tidak ada order pending saat ini.</p>
+        @else
+            <table class="table table-borderless table-hover mb-0">
+                <thead class="border-bottom">
+                    <tr>
+                        <th>No</th>
+                        <th>Customer</th>
+                        <th>Pickup</th>
+                        <th>Tujuan</th>
+                        <th>Jarak</th>
+                        <th>Tipe</th>
+                        <th>Harga</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($pendingOrders as $index => $order)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $order->user->name ?? 'Unknown' }}</td>
+                        <td>{{ Str::limit($order->pickup, 25) }}</td>
+                        <td>{{ Str::limit($order->destination, 25) }}</td>
+                        <td>{{ number_format($order->distance, 2) }} km</td>
+                        <td>{{ $order->vehicle_type }}</td>
+                        <td>Rp {{ number_format($order->price, 0, ',', '.') }}</td>
+                        <td>
+                            <form method="POST" action="{{ route('driver.take-order', $order->id) }}">
                                 @csrf
-                                <button type="submit">Selesai</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Ambil</button>
                             </form>
-                        @else
-                            -
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
-</body>
-</html>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    </div>
+</div>
+
+{{-- Order Saya --}}
+<div class="card">
+    <div class="card-body">
+        <h6 class="fw-bold mb-3">Order Saya</h6>
+        @if($myOrders->isEmpty())
+            <p class="text-muted mb-0">Belum ada order yang diambil.</p>
+        @else
+            <table class="table table-borderless table-hover mb-0">
+                <thead class="border-bottom">
+                    <tr>
+                        <th>No</th>
+                        <th>Customer</th>
+                        <th>Pickup</th>
+                        <th>Tujuan</th>
+                        <th>Jarak</th>
+                        <th>Harga</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($myOrders as $index => $order)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $order->user->name ?? 'Unknown' }}</td>
+                        <td>{{ Str::limit($order->pickup, 25) }}</td>
+                        <td>{{ Str::limit($order->destination, 25) }}</td>
+                        <td>{{ number_format($order->distance, 2) }} km</td>
+                        <td>Rp {{ number_format($order->price, 0, ',', '.') }}</td>
+                        <td>
+                            @if($order->status === 'ongoing')
+                                <span class="badge bg-info text-dark">Ongoing</span>
+                            @elseif($order->status === 'paid')
+                                <span class="badge bg-success">Paid</span>
+                            @else
+                                <span class="badge bg-secondary">{{ $order->status }}</span>
+                            @endif
+                        </td>
+                        <td class="d-flex gap-1">
+                            <a href="{{ route('chat.show', $order->id) }}" class="btn btn-info btn-sm">
+                                <i class="bi bi-chat-dots"></i>
+                            </a>
+                            @if($order->status == 'ongoing')
+                                <form method="POST" action="{{ route('orders.complete', $order->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-sm">Selesai</button>
+                                </form>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    </div>
+</div>
+@endsection
