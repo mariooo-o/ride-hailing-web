@@ -1,101 +1,106 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-</head>
-<body>
-    <h2>Driver Dashboard</h2>
-    <p>Selamat datang, {{ $user->name }}!</p>
+@extends('layouts.main')
 
-    <form method="POST" action="/logout">
-        @csrf
-        <button type="submit">Logout</button>
-    </form>
+@section('title', 'Driver Dashboard')
 
-    <hr>
+@section('content')
 
-    @if(session('success'))
-        <p>{{ session('success') }}</p>
-    @endif
+    <h2 class="mb-4">Selamat datang, {{ $user->name }}!</h2>
 
-    <h3>Status Akun</h3>
-    <p>Status: <strong>{{ $driver->status == 'active' ? 'Aktif' : 'Tidak Aktif' }}</strong></p>
+    <div class="card p-4 mb-4">
+        <h5 class="mb-3">Status Akun</h5>
+        <p class="mb-2">
+            Status:
+            @if($driver->status == 'active')
+                <span class="badge bg-success">Aktif</span>
+            @else
+                <span class="badge bg-secondary">Tidak Aktif</span>
+            @endif
+        </p>
 
-    @if($driver->status == 'active')
-        <p>Online: <strong>{{ $driver->available ? 'Online' : 'Offline' }}</strong></p>
-        <form method="POST" action="/driver/toggle-available">
-            @csrf
-            @method('PATCH')
-            <button type="submit">
-                {{ $driver->available ? 'Set Offline' : 'Set Online' }}
-            </button>
-        </form>
-    @else
-        <p><em>Akun kamu belum diapprove admin. Harap tunggu.</em></p>
-    @endif
+        @if($driver->status == 'active')
+            <p class="mb-3">
+                Online:
+                <span class="badge {{ $driver->available ? 'bg-success' : 'bg-secondary' }}">
+                    {{ $driver->available ? 'Online' : 'Offline' }}
+                </span>
+            </p>
+            <form method="POST" action="{{ route('driver.toggle-available') }}">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn btn-primary btn-sm">
+                    {{ $driver->available ? 'Set Offline' : 'Set Online' }}
+                </button>
+            </form>
+        @else
+            <p class="text-muted mb-0"><em>Akun kamu belum diapprove admin. Harap tunggu.</em></p>
+        @endif
+    </div>
 
-    <hr>
-
-    <h3>Profil Saya</h3>
-    <table border="1" cellpadding="8">
-        <tr>
-            <td>Nama</td>
-            <td>{{ $user->name }}</td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td>{{ $user->email }}</td>
-        </tr>
-        <tr>
-            <td>No. HP</td>
-            <td>{{ $driver->phone_number }}</td>
-        </tr>
-        <tr>
-            <td>No. SIM</td>
-            <td>{{ $driver->license_number }}</td>
-        </tr>
-    </table>
-
-    <hr>
-
-    <h3>Kendaraan Saya</h3>
-    @if($driver->vehicle)
-        <table border="1" cellpadding="8">
+    <div class="card p-4 mb-4">
+        <h5 class="mb-3">Profil Saya</h5>
+        <table class="table table-borderless mb-0">
             <tr>
-                <td>Merk</td>
-                <td>{{ $driver->vehicle->brand }}</td>
+                <td class="text-muted" style="width: 150px;">Nama</td>
+                <td>{{ $user->name }}</td>
             </tr>
             <tr>
-                <td>Model</td>
-                <td>{{ $driver->vehicle->model }}</td>
+                <td class="text-muted">Email</td>
+                <td>{{ $user->email }}</td>
             </tr>
             <tr>
-                <td>Warna</td>
-                <td>{{ $driver->vehicle->color }}</td>
+                <td class="text-muted">No. HP</td>
+                <td>{{ $driver->phone_number }}</td>
             </tr>
             <tr>
-                <td>Plat Nomor</td>
-                <td>{{ $driver->vehicle->plate_number }}</td>
-            </tr>
-            <tr>
-                <td>Tahun</td>
-                <td>{{ $driver->vehicle->year }}</td>
-            </tr>
-            <tr>
-                <td>Tipe</td>
-                <td>{{ $driver->vehicle->type }}</td>
-            </tr>
-            <tr>
-                <td>Status Verifikasi</td>
-                <td>{{ $driver->vehicle->verification_status }}</td>
+                <td class="text-muted">No. SIM</td>
+                <td>{{ $driver->license_number }}</td>
             </tr>
         </table>
-    @else
-        <p>Belum ada kendaraan terdaftar.</p>
-    @endif
-    <h3>Menu</h3>
-    <a href="/driver/orders">Lihat Order Tersedia</a>
-</body>
-</html>
+    </div>
+
+    <div class="card p-4 mb-4">
+        <h5 class="mb-3">Kendaraan Saya</h5>
+        @if($driver->vehicle)
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <td class="text-muted" style="width: 150px;">Merk</td>
+                    <td>{{ $driver->vehicle->brand }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Model</td>
+                    <td>{{ $driver->vehicle->model }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Warna</td>
+                    <td>{{ $driver->vehicle->color }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Plat Nomor</td>
+                    <td>{{ $driver->vehicle->plate_number }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Tahun</td>
+                    <td>{{ $driver->vehicle->year }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Tipe</td>
+                    <td>{{ $driver->vehicle->type }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Status Verifikasi</td>
+                    <td>{{ $driver->vehicle->verification_status }}</td>
+                </tr>
+            </table>
+        @else
+            <p class="text-muted mb-0">Belum ada kendaraan terdaftar.</p>
+        @endif
+    </div>
+
+    <div class="card p-4">
+        <h5 class="mb-3">Menu</h5>
+        <a href="{{ route('driver.orders') }}" class="btn btn-primary">
+            Lihat Order Tersedia
+        </a>
+    </div>
+
+@endsection

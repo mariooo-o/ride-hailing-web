@@ -1,40 +1,34 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Dashboard</title>
-</head>
-<body>
-    <h2>Customer Dashboard</h2>
-    <p>Selamat datang, {{ Auth::user()->name }}!</p>
+@extends('layouts.main')
 
-    <form method="POST" action="/logout">
-        @csrf
-        <button type="submit">Logout</button>
-    </form>
+@section('title', 'Customer Dashboard')
 
-    <hr>
+@section('content')
 
-    <h3>Profil Saya</h3>
-    <table border="1" cellpadding="8">
-        <tr>
-            <td>Nama</td>
-            <td>{{ $user->name }}</td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td>{{ $user->email }}</td>
-        </tr>
-        <tr>
-            <td>No. HP</td>
-            <td>{{ $user->phone_number }}</td>
-        </tr>
-    </table>
+    <h2 class="mb-4">Selamat datang, {{ Auth::user()->name }}!</h2>
 
-    <hr>
+    <div class="card p-4 mb-4">
+        <h5 class="mb-3">Profil Saya</h5>
+        <table class="table table-borderless mb-0">
+            <tr>
+                <td class="text-muted" style="width: 150px;">Nama</td>
+                <td>{{ $user->name }}</td>
+            </tr>
+            <tr>
+                <td class="text-muted">Email</td>
+                <td>{{ $user->email }}</td>
+            </tr>
+            <tr>
+                <td class="text-muted">No. HP</td>
+                <td>{{ $user->phone_number ?? '-' }}</td>
+            </tr>
+        </table>
+    </div>
 
-    <h3>Menu</h3>
-    <a href="/customer/daftar-driver">Daftar Jadi Driver</a>
-</body>
-</html>
+    <div class="card p-4">
+        <h5 class="mb-3">Menu</h5>
+        <a href="{{ route('customer.daftar-driver') }}" class="btn btn-primary">
+            Daftar Jadi Driver
+        </a>
+    </div>
+
+@endsection
